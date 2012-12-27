@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import re, sys
+
 __USAGE__ = \
 """BUMP is a semantic versioning bump script which accepts the following 
 mutually exclusive arguments:
@@ -9,14 +11,24 @@ mutually exclusive arguments:
    All of these options allow for the -r flag, which indicates that the state
    is a RELEASE not a SNAPSHOT. If -r is not specified, then -SNAPSHOT is
    appended to the updated version string."""
-import re, sys
+
+__INITIAL__ = ['0', '0', '1']
+
 
 if __name__ == "__main__":
-    v = re.split(re.compile("\.|-"),open("VERSION").read()) or ['0', '0', '1']
+    v = []
     try:
+        v = re.split(re.compile("\.|-"),open("VERSION").read()) or __INITIAL__
         v = v[0:3]
-    except:
-        print("fatal error parsing VERSION file!")
+        map(int, v)
+
+    except ValueError:
+        print("failed to parse the existing VERSION file, assuming v 0.0.1")
+        v = ['0', '0', '1']
+
+    except FileNotFoundError:
+        print("failed to find a VERSION file, assuming v 0.0.0")
+        v = ['0', '0', '0']
 
     op = ''
     try:
@@ -41,9 +53,12 @@ if __name__ == "__main__":
     v = '.'.join(v)
 
     if "-r" not in sys.argv:
-        v+="-SNAPSHOT"
+        v += "-SNAPSHOT"
     
     v += "\n"
 
+    print(v)
+
     open("VERSION",'w').write(v)
+    
     sys.exit(0)
