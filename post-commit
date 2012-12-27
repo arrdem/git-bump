@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ "$_BUMP" != "1" ]
+then
+    bump -p
+    export _BUMP=1
+    git commit VERSION -m "[auto] bumped version to $(cat VERSION)"
+fi

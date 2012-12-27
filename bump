@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+__USAGE__ = \
+"""BUMP is a semantic versioning bump script which accepts the following 
+mutually exclusive arguments:
+   -m - a "major" version bump equal to +1.0.0
+   -n - a "minor" version bump equal to +0.1.0
+   -p - a "patch" version bump equal to +0.0.1
+
+   All of these options allow for the -r flag, which indicates that the state
+   is a RELEASE not a SNAPSHOT. If -r is not specified, then -SNAPSHOT is
+   appended to the updated version string."""
+import re, sys
+
+if __name__ == "__main__":
+    v = re.split(re.compile("\.|-"),open("VERSION").read()) or ['0', '0', '1']
+    try:
+        v = v[0:3]
+    except:
+        print("fatal error parsing VERSION file!")
+
+    op = ''
+    try:
+        op = sys.argv[1]
+    except:
+        print(__USAGE__)
+        sys.exit(-1)
+
+    if(op == '-m'):
+        v = [str(int(v[0])+1), '0', '0']
+
+    elif(op == '-n'):
+        v = [v[0], str(int(v[1])+1), '0']
+
+    elif(op == '-p'):
+        v = [v[0], v[1], str(int(v[2])+1)]
+
+    else:
+        print(__USAGE__)
+        sys.exit(-1)
+
+    v = '.'.join(v)
+
+    if "-r" not in sys.argv:
+        v+="-SNAPSHOT"
+    
+    v += "\n"
+
+    open("VERSION",'w').write(v)
+    sys.exit(0)

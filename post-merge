@@ -1,0 +1,14 @@
+#!/bin/sh
+if [ "$_BUMP" != "1" ]
+then
+    branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+    if [ branch == "master" ]
+    then
+        bump -m
+    else
+        bump -n
+    fi
+
+    export _BUMP=1
+    git commit VERSION -m "[auto] bumped version to $(cat VERSION)"
+fi
