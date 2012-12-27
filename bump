@@ -20,8 +20,15 @@ if __name__ == "__main__":
     try:
         v = re.split(re.compile("\.|-"),open("VERSION").read()) or __INITIAL__
         v = v[0:3]
-    except:
+        map(int, v)
+
+    except ValueError:
+        print("failed to parse the existing VERSION file, assuming v 0.0.1")
         v = ['0', '0', '1']
+
+    except FileNotFoundError:
+        print("failed to find a VERSION file, assuming v 0.0.0")
+        v = ['0', '0', '0']
 
     op = ''
     try:
@@ -50,5 +57,8 @@ if __name__ == "__main__":
     
     v += "\n"
 
+    print(v)
+
     open("VERSION",'w').write(v)
+    
     sys.exit(0)
