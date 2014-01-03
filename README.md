@@ -15,7 +15,7 @@ This setup uses two hooks - the `post-commit` hook and the `post-merge` hook.
 
   - post-commit - "patch" bump (+ 0.0.1)
   - post-merge  - "minor" bump (+ 0.1.0) when merging to non-master branches
-  - post-merge  - "major" bump (+ 1.0.0) when mergint to "master"
+  - post-merge  - "major" bump (+ 1.0.0) when merging to "master"
 
 The idea clearly being that, when combined with git flow, the result will be a 
 sane and strictly increasing version number indicative of the state of the 
