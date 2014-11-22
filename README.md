@@ -1,7 +1,7 @@
 # Git Bump
 Version numbers are an amazing thing. They make it trivial to figure out whether
 or not a program is at the most recent version, and there are even some 
-relatively sane standards such as [semantic versioning](semver.org) which the 
+relatively sane standards such as [semantic versioning](http://semver.org) which the 
 Clojure community has adopted as the standard format for version numbers.
 
 As a [git flow](http://nvie.com/posts/a-successful-git-branching-model/) adherent, while my branching strategy may be elegant I often 
