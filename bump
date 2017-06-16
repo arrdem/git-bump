@@ -1,64 +1,61 @@
-#!/usr/bin/env python
-import re, sys
+#!/usr/bin/env python2
 
-__USAGE__ = \
-"""BUMP is a semantic versioning bump script which accepts the following 
-mutually exclusive arguments:
-   -m - a "major" version bump equal to +1.0.0
-   -n - a "minor" version bump equal to +0.1.0
-   -p - a "patch" version bump equal to +0.0.1
+"""
+A quick and dirty SemVer bump script.
+"""
 
-   All of these options allow for the -r flag, which indicates that the state
-   is a RELEASE not a SNAPSHOT. If -r is not specified, then -SNAPSHOT is
-   appended to the updated version string."""
+from __future__ import print_function
 
-__INITIAL__ = ['0', '0', '1']
+import argparse
+from collections import namedtuple
+import re
+import sys
+
+parser = argparse.ArgumentParser(description=__doc__)
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("-m", "--major", action="store_true", default=False, help="Bump the major part.")
+group.add_argument("-n", "--minor", action="store_true", default=False, help="Bump the minor part.")
+group.add_argument("-p", "--patch", action="store_true", default=False, help="Bump the patch part.")
+
+
+class Version(namedtuple('Version', ['major', 'minor', 'patch'])):
+  def __add__(self, other):
+    return Version(*(l+r for l, r in zip(self, other)))
+
+  def __str__(self):
+    return "{0}.{1}.{2}".format(self.major, self.minor, self.patch)
+
+__INITIAL__ = Version(0, 0, 0)
+
+
+def main(opts):
+  v = None
+  try:
+    with open("VERSION") as f:
+      v = re.split(re.compile("\\.|-"), f.read()) or __INITIAL__
+      v = Version(*map(int, v[0:3]))
+
+  except ValueError:
+    print("failed to parse the existing VERSION file, assuming v0.0.0")
+    v = __INITIAL__
+
+  except IOError:
+    print("failed to find a VERSION file, assuming v0.0.0")
+    v = __INITIAL__
+
+  if opts.major:
+    v = v + (1, 0, 0)
+  elif opts.minor:
+    v = v + (0, 1, 0)
+  elif opts.patch:
+    v = v + (0, 0, 1)
+
+  print(v)
+
+  open("VERSION", 'w').write(str(v))
+
+  sys.exit(0)
 
 
 if __name__ == "__main__":
-    v = []
-    try:
-        v = re.split(re.compile("\.|-"),open("VERSION").read()) or __INITIAL__
-        v = v[0:3]
-        map(int, v)
-
-    except ValueError:
-        print("failed to parse the existing VERSION file, assuming v 0.0.1")
-        v = ['0', '0', '1']
-
-    except FileNotFoundError:
-        print("failed to find a VERSION file, assuming v 0.0.0")
-        v = ['0', '0', '0']
-
-    op = ''
-    try:
-        op = sys.argv[1]
-    except:
-        print(__USAGE__)
-        sys.exit(-1)
-
-    if(op == '-m'):
-        v = [str(int(v[0])+1), '0', '0']
-
-    elif(op == '-n'):
-        v = [v[0], str(int(v[1])+1), '0']
-
-    elif(op == '-p'):
-        v = [v[0], v[1], str(int(v[2])+1)]
-
-    else:
-        print(__USAGE__)
-        sys.exit(-1)
-
-    v = '.'.join(v)
-
-    if "-r" not in sys.argv:
-        v += "-SNAPSHOT"
-    
-    v += "\n"
-
-    print(v)
-
-    open("VERSION",'w').write(v)
-    
-    sys.exit(0)
+  main(parser.parse_args())
