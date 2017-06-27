@@ -19,8 +19,15 @@ group.add_argument("-p", "--patch", action="store_true", default=False, help="Bu
 
 
 class Version(namedtuple('Version', ['major', 'minor', 'patch'])):
-  def __add__(self, other):
-    return Version(*(l+r for l, r in zip(self, other)))
+
+  def bump_patch(self):
+    return Version(self.major, self.minor, self.patch + 1)
+
+  def bump_minor(self):
+    return Version(self.major, self.minor + 1, 0)
+
+  def bump_major(self):
+    return Version(self.major + 1, 0, 0)
 
   def __str__(self):
     return "{0}.{1}.{2}".format(self.major, self.minor, self.patch)
@@ -44,11 +51,13 @@ def main(opts):
     v = __INITIAL__
 
   if opts.major:
-    v = v + (1, 0, 0)
+    v = v.bump_major()
+
   elif opts.minor:
-    v = v + (0, 1, 0)
+    v = v.bump_minor()
+
   elif opts.patch:
-    v = v + (0, 0, 1)
+    v = v.bump_patch()
 
   print(v)
 
